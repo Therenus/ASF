@@ -20,7 +20,7 @@ const BookList = (props) => {
       }
     }
     fetchdata();
-  },[])
+  },[setBooks])
 
   return (
     <div>

@@ -61,7 +61,7 @@ const AddBook = (props) => {
                 if(!(/^[0-9]+$/.test(year))){
                     newErrors.year = 'Can contain only digits'
                 }else{
-                    if(year.length != 4){
+                    if(year.length !== 4){
                         newErrors.year = 'Invalid format'
                     }else{
         }}}

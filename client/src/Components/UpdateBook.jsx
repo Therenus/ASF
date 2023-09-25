@@ -25,7 +25,7 @@ const UpdateBook = (props) => {
           }
         }
         fetchdata();
-      },[])
+      },[isbn])
 
 
     const handleSubmit = async (e) => {

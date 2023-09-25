@@ -18,14 +18,14 @@ const BookDetail = (props) => {
             }
         }
         fetchData();
-    },[])
+    },[setSelectetBook, isbn])
 
     if (selectedBook){
         const handleDelete = async (e, isbn) => {
             e.stopPropagation();
             try {
                 const response = await BookFinder.delete(`/${isbn}`);
-  
+                console.log(response);
                 navigate(`/`)
             } catch (err) {
                 console.log(err);
