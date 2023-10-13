@@ -10,6 +10,8 @@ import cors from 'cors' ;
 import {query} from './db.js' ;
 import * as path from 'path';
 
+import openai from 'openai';
+
 
 const app = express();
 app.use(cors());
@@ -20,6 +22,37 @@ app.use(express.json());
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
+
+
+
+
+
+
+// connect to openAI API
+
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+
+const client = new openai({ key: OPENAI_API_KEY });
+
+// openAI API filtering
+
+
+async function getCategoryList() {
+    try {
+      const categories = await query('SELECT * FROM categories');
+      console.log(categories);
+      return categories;
+    } catch (error) {
+      console.error('Chyba při získávání kategorií z databáze:', error);
+      throw error;
+    }
+  }
+
+
+  
+
+
+
 
 // get list of books
 app.get('/apiv1.0.0/', async (req, res) => { 
