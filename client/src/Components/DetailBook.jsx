@@ -5,27 +5,28 @@ import BookFinder from '../Apis/BookFinder'
 
 const BookDetail = (props) => {
   const {isbn} = useParams()
-  const {selectedBook, setSelectetBook} = useContext(BookContext)
+  console.log ("params", useParams)
+  console.log ("isbn:", isbn)
+  const {selectedBook, setSelectedBook} = useContext(BookContext)
   const navigate = useNavigate()
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await BookFinder.get(`/${isbn}`);
-                setSelectetBook(response.data.data.books)
-            } catch (err) {
-                console.log(err);
-            }
+  useEffect(() => {
+    const fetchData = async () => {
+        try {
+            const response = await BookFinder.get(`/${isbn}`);
+            setSelectedBook(response.data.data.books)
+        } catch (err) {
+            console.log(err);
         }
-        fetchData();
-    },[setSelectetBook, isbn])
+    }
+    fetchData();
+},[setSelectedBook, isbn])
 
     if (selectedBook){
         const handleDelete = async (e, isbn) => {
             e.stopPropagation();
             try {
                 const response = await BookFinder.delete(`/${isbn}`);
-                console.log(response);
                 navigate(`/`)
             } catch (err) {
                 console.log(err);

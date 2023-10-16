@@ -3,31 +3,38 @@ import BookFinder from '../Apis/BookFinder';
 import { BookContext } from '../cAPI';
 import { useNavigate } from 'react-router-dom'
 
-//let navigate = useNavigate
-
 const BookList = (props) => {
-  const {books, setBooks} = useContext(BookContext)
+  const {books, setBooks, selectedCategory} = useContext(BookContext)
   
   const navigate = useNavigate()
 
   useEffect(() => {
     const fetchdata = async () => {
-      try {
-        const response = await BookFinder.get("/");
-        setBooks(response.data.data.books);
-      } catch (err) {
-        console.log(err);
+      if (selectedCategory) {
+        try {
+          const response = await BookFinder.get("/", { params: {category: selectedCategory}})
+          console.log (response)
+          setBooks(response.data.data.books);
+        } catch (err) {
+          console.log(err);
+        }
+      }else{
+        try {
+          const response = await BookFinder.get("/");
+          setBooks(response.data.data.books);
+        } catch (err) {
+          console.log(err);
+        }
       }
     }
     fetchdata();
-  },[setBooks])
+  },[setBooks, selectedCategory])
 
   return (
-    <div>
-      <div className="mb-3 d-grid gap-2 d-md-flex justify-content-md-end">
-        <button onClick={(e) => navigate(`/addbook`)} className="btn btn-danger">Add Book</button>
-      </div>
       <div className="mb-3">
+        <div>
+        <label></label>  
+        <input className="form-control" type="text" value={selectedCategory} disabled readOnly /> </div>
         <table className="table table-striped-columns">
           <thead>
             <tr className="table-dark">
@@ -36,25 +43,25 @@ const BookList = (props) => {
               <th scope="col">Year</th>
               <th scope="col">Publisher</th>
               <th scope="col">ISBN</th>
+              <th scope="col">Category</th>
             </tr>
           </thead>
-
           <tbody>
             {books && books.map((books) => {
               return (
-                <tr onClick={() => navigate(`/${books.isbn}`)} key={books.isbn}>
+                <tr onClick={(e) => navigate(`/${books.isbn}`)} key={books.isbn}>
                   <td>{books.title}</td>
                  <td>{books.author}</td>
                   <td>{books.year}</td>
                   <td>{books.publisher}</td>
-                  <td>{books.isbn}</td> 
+                  <td>{books.isbn}</td>
+                  <td>{books.category}</td> 
                 </tr>
               )
             })}
           </tbody>
         </table>
-      </div>
-    </div>      
+      </div>      
   )
 };
 
