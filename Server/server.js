@@ -31,9 +31,10 @@ const openai = new OpenAI({
 
 // openAI API filtering
 
+// get Category List from DB 
+
 //async function getCategoryList() {
 //    try {
-//        // Získej kategorie z databáze
 //        const categories = await query('SELECT category_name FROM categories');
 //        console.log(categories);
 //        return categories;
@@ -45,12 +46,12 @@ const openai = new OpenAI({
   
 
 async function assignCategoriesToText(text) {
-//    getCategoryList 
+// get Category List from DB 
     try{
         const categoriesResult = await query('SELECT category_name FROM categories');
         const categories = categoriesResult.rows.map((row) => row.category_name);
 
-        // Volání OpenAI API pro přiřazení kategorií
+        // Call AI api for asssign user input to categories
         
         const response = await openai.completions.create({
             model: "text-davinci-003",
@@ -61,10 +62,10 @@ async function assignCategoriesToText(text) {
 
         });
   
-        // Extrahuj nejvýstižnější kategorii
+        // Extract best category
         const bestCategory = response.choices[0].text;
   
-        // Extrahuj nabídnuté kategorie (můžeš upravit podle potřeby)
+        // Extract other suggested category, currently doesnt work, future tune of AI prompt needed, return empty array
         const offeredCategories = response.choices.slice(1).map((choice) => choice.text);
         console.log('Nejvýstižnější kategorie:', bestCategory);
         console.log('Nabídnuté kategorie:', offeredCategories);
