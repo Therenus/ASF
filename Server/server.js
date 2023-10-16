@@ -8,8 +8,8 @@ import express from 'express' ;
 import cors from 'cors' ;
 
 import {query} from './db.js' ;
-import * as path from 'path';
 
+import OpenAI from 'openai';
 
 const app = express();
 app.use(cors());
@@ -20,6 +20,74 @@ app.use(express.json());
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
+
+// connect to openAI API
+
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
+// openAI API filtering
+
+//async function getCategoryList() {
+//    try {
+//        // Získej kategorie z databáze
+//        const categories = await query('SELECT category_name FROM categories');
+//        console.log(categories);
+//        return categories;
+//      } catch (error) {
+//          console.error('Chyba při získávání kategorií z databáze:', error);
+//          throw error;
+//        }
+//  }
+  
+
+async function assignCategoriesToText(text) {
+//    getCategoryList 
+    try{
+        const categoriesResult = await query('SELECT category_name FROM categories');
+        console.log(categoriesResult)
+        const categories = categoriesResult.rows.map((row) => row.category_name);
+        console.log(categories)
+        console.log(categories.join(', '))
+
+        // Volání OpenAI API pro přiřazení kategorií
+        
+        const response = await openai.completions.create({
+            model: "text-davinci-003",
+            //prompt: "Say this is a test.",
+            //prompt: `Kategorie pro text: "${text}" Kategorie: ${categories}`,
+            prompt: `Categorize the following text: "${text}" into one of the following categories: ${categories.join(', ')}.`,
+            temperature: 0,
+
+        });
+  
+        // Extrahuj nejvýstižnější kategorii
+        const bestCategory = response.choices[0].text;
+  
+        // Extrahuj nabídnuté kategorie (můžeš upravit podle potřeby)
+        const offeredCategories = response.choices.slice(1).map((choice) => choice.text);
+  
+        return { bestCategory, offeredCategories };
+    } catch (error) {
+      console.error('Chyba:', error);
+      return { bestCategory: null, offeredCategories: [] };
+    }
+}
+  
+// Použití funkce
+const textToClassify = 'potřebuji něco o jaderne elektrarne';
+  
+assignCategoriesToText(textToClassify)
+    .then((result) => {
+      console.log('Nejvýstižnější kategorie:', result.bestCategory);
+      console.log('Nabídnuté kategorie:', result.offeredCategories);
+    });
+
+
+
 
 // get list of books
 app.get('/apiv1.0.0/', async (req, res) => { 
